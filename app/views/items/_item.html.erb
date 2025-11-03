@@ -1,0 +1,40 @@
+﻿<div id="<%= dom_id item %>">
+  <div>
+    <strong>Box:</strong>
+    <%= item.box_id %>
+  </div>
+
+  <div>
+    <strong>Name:</strong>
+    <%= item.name %>
+  </div>
+
+  <div>
+    <strong>Category:</strong>
+    <%= item.category %>
+  </div>
+
+  <div>
+    <strong>Quantity:</strong>
+    <%= item.quantity %>
+  </div>
+
+  <div>
+    <strong>Position:</strong>
+    <%= item.position %>
+  </div>
+
+  <div>
+    <strong>Notes:</strong>
+    <%= item.notes %>
+  </div>
+  
+  <div id="<%= dom_id item %>">
+  <p><strong>Codice:</strong> <%= item.code %></p>
+  <p><strong>Nome:</strong> <%= item.name %></p>
+  <p><strong>Descrizione:</strong> <%= item.description %></p>
+  <p><strong>Box:</strong> <%= item.box&.name || "—" %></p>
+</div>
+
+  
+</div>

@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  item: one
+  user: one
+  action: MyString
+  from_box: one
+  to_box: one
+  notes: MyText
+
+two:
+  item: two
+  user: two
+  action: MyString
+  from_box: two
+  to_box: two
+  notes: MyText

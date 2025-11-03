@@ -1,0 +1,34 @@
+# encoding: utf-8
+
+<p style="color: green"><%= notice %></p>
+
+<h1>Oggetti</h1>
+
+<div style="margin-bottom: 1em;">
+  <%= link_to "Crea nuovo oggetto", new_item_path, class: "btn btn-success" %>
+</div>
+
+<table border="1" cellpadding="6">
+  <thead>
+    <tr>
+      <th>Codice</th>
+      <th>Nome</th>
+      <th>Box</th>
+      <th>Azioni</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td><%= item.code %></td>
+        <td><%= item.name %></td>
+        <td><%= item.box&.name || "-" %></td>
+        <td>
+          <%= link_to "Mostra", item_path(item), class: "btn btn-sm btn-primary" %> |
+          <%= link_to "Modifica", edit_item_path(item), class: "btn btn-sm btn-warning" %> |
+          <%= button_to "Elimina", item_path(item), method: :delete, data: { confirm: "Sei sicuro?" }, class: "btn btn-sm btn-danger" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

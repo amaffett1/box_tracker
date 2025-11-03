@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_03_110329) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_03_162825) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "boxes", force: :cascade do |t|
     t.string "code"
@@ -21,18 +49,37 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_03_110329) do
     t.string "location"
     t.string "name"
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_boxes_on_user_id"
   end
 
   create_table "items", force: :cascade do |t|
     t.bigint "box_id", null: false
     t.string "category"
+    t.string "code"
     t.datetime "created_at", null: false
+    t.text "description"
     t.string "name"
     t.text "notes"
     t.string "position"
     t.integer "quantity"
     t.datetime "updated_at", null: false
     t.index ["box_id"], name: "index_items_on_box_id"
+  end
+
+  create_table "movements", force: :cascade do |t|
+    t.string "action"
+    t.datetime "created_at", null: false
+    t.bigint "from_box_id"
+    t.bigint "item_id", null: false
+    t.text "notes"
+    t.bigint "to_box_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["from_box_id"], name: "index_movements_on_from_box_id"
+    t.index ["item_id"], name: "index_movements_on_item_id"
+    t.index ["to_box_id"], name: "index_movements_on_to_box_id"
+    t.index ["user_id"], name: "index_movements_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -42,6 +89,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_03_110329) do
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.string "role"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -53,5 +101,12 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_03_110329) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "boxes", "users"
   add_foreign_key "items", "boxes"
+  add_foreign_key "movements", "boxes", column: "from_box_id"
+  add_foreign_key "movements", "boxes", column: "to_box_id"
+  add_foreign_key "movements", "items"
+  add_foreign_key "movements", "users"
 end

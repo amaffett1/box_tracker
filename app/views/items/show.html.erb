@@ -1,0 +1,63 @@
+﻿
+
+<p style="color: green"><%= notice %></p>
+
+<% if @item.image.attached? %>
+  <p><%= image_tag @item.image.variant(resize_to_limit: [300, 300]) %></p>
+<% end %>
+
+<h2><%= @item.name %></h2>
+<p><strong>Codice:</strong> <%= @item.code %></p>
+<p><strong>Descrizione:</strong> <%= @item.description %></p>
+<p><strong>Box attuale:</strong> <%= @item.box&.name || "Nessuna box assegnata" %></p>
+
+<div style="margin-top: 1em;">
+  <%= link_to "Modifica questo oggetto", edit_item_path(@item), class: "btn btn-primary" %> |
+  <%= link_to "Torna alla lista", items_path, class: "btn btn-secondary" %>
+</div>
+
+<hr>
+
+<h3>Azioni rapide</h3>
+
+<%= form_with url: movements_path, method: :post do |f| %>
+  <%= f.hidden_field :item_id, value: @item.id %>
+
+  <div>
+    <%= f.label :action, "Tipo di movimento" %><br>
+    <%= f.select :action, [["Spostato", "moved"], ["Prestato", "loaned"], ["Restituito", "returned"]], prompt: "Seleziona" %>
+  </div>
+
+  <div>
+    <%= f.label :to_box_id, "Spostato in (Box di destinazione)" %><br>
+    <%= f.collection_select :to_box_id, current_user.boxes.order(:name), :id, :name, prompt: "Seleziona box" %>
+  </div>
+
+  <div>
+    <%= f.label :notes, "Note" %><br>
+    <%= f.text_area :notes %>
+  </div>
+
+  <div style="margin-top: 1em;">
+    <%= f.submit "Registra movimento", class: "btn btn-success" %>
+  </div>
+<% end %>
+
+<hr>
+
+<h3>Storico movimenti</h3>
+<ul>
+  <% @item.movements.order(created_at: :desc).each do |m| %>
+    <li>
+      <strong><%= m.created_at.strftime("%d/%m/%Y %H:%M") %></strong> —
+      <%= m.action.capitalize %> da <%= m.from_box&.name || "?" %> a <%= m.to_box&.name || "?" %>
+      (<%= m.user.email %>)
+      <% if m.notes.present? %> — <em><%= m.notes %></em><% end %>
+    </li>
+  <% end %>
+</ul>
+
+<div style="margin-top: 1em;">
+  <%= button_to "Elimina questo oggetto", @item, method: :delete, data: { confirm: "Sei sicuro?" }, class: "btn btn-danger" %>
+</div>
+

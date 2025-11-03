@@ -1,0 +1,19 @@
+<p style="color: green"><%= notice %></p>
+
+<% if @box.image.attached? %>
+  <div style="margin: 10px 0;">
+    <%= image_tag url_for(@box.image), style: "max-width: 300px; height: auto; border-radius: 8px; box-shadow: 0 0 6px #aaa;" %>
+  </div>
+<% else %>
+  <p><em>Nessuna immagine allegata</em></p>
+<% end %>
+
+
+<%= render @box %>
+
+<div>
+  <%= link_to "Edit this box", edit_box_path(@box) %> |
+  <%= link_to "Back to boxes", boxes_path %>
+
+  <%= button_to "Destroy this box", @box, method: :delete %>
+</div>
