@@ -5,4 +5,6 @@ class Movement < ApplicationRecord
   belongs_to :to_box, class_name: "Box", optional: true
 
   validates :action, presence: true
+
+  validates :action, presence: true, inclusion: { in: %w[moved loaned returned] }
 end

@@ -45,16 +45,27 @@
 
 <hr>
 
+<hr>
+
 <h3>Storico movimenti</h3>
-<ul>
-  <% @item.movements.order(created_at: :desc).each do |m| %>
-    <li>
-      <strong><%= m.created_at.strftime("%d/%m/%Y %H:%M") %></strong> —
-      <%= m.action.capitalize %> da <%= m.from_box&.name || "?" %> a <%= m.to_box&.name || "?" %>
-      (<%= m.user.email %>)
-      <% if m.notes.present? %> — <em><%= m.notes %></em><% end %>
-    </li>
-  <% end %>
+
+<% if @movements.present? %>
+  <ul>
+    <% @movements.each do |m| %>
+      <li>
+        <strong><%= m.created_at.strftime("%d/%m/%Y %H:%M") %></strong> –
+        <%= m.action.capitalize %> da 
+        <%= m.from_box&.name || "-" %> a 
+        <%= m.to_box&.name || "-" %> 
+        (<%= m.user.email %>)
+        <% if m.notes.present? %> – <em><%= m.notes %></em><% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>Nessun movimento registrato per questo oggetto.</p>
+<% end %>
+
 </ul>
 
 <div style="margin-top: 1em;">

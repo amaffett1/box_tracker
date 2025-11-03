@@ -1,24 +1,29 @@
+# encoding: utf-8
+
 class MovementsController < ApplicationController
   before_action :authenticate_user!
-
-  def index
-    @movements = Movement.joins(:item).where(items: { box_id: current_user.boxes.pluck(:id) }).order(created_at: :desc)
-  end
 
   def create
     @movement = Movement.new(movement_params)
     @movement.user = current_user
 
+    # Imposta la box di partenza (quella attuale dell’oggetto)
+    @movement.from_box = @movement.item.box
+
     if @movement.save
-      redirect_to @movement.item, notice: "Movimento registrato."
+      # Se è stato selezionato un box di destinazione, aggiorna l'oggetto
+      if @movement.to_box.present?
+        @movement.item.update(box: @movement.to_box)
+      end
+      redirect_to item_path(@movement.item), notice: "Movimento registrato correttamente."
     else
-      redirect_back fallback_location: root_path, alert: "Errore nel salvataggio del movimento."
+      redirect_to item_path(@movement.item), alert: "Errore nella registrazione del movimento."
     end
   end
 
   private
 
   def movement_params
-    params.require(:movement).permit(:item_id, :action, :from_box_id, :to_box_id, :notes)
+    params.require(:movement).permit(:item_id, :action, :to_box_id, :notes)
   end
 end

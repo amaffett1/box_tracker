@@ -69,5 +69,9 @@ class ItemsController < ApplicationController
       unless @item.box.user_id == current_user.id
         redirect_to items_path, alert: "Non autorizzato"
       end
+      def show
+      @item = Item.find(params[:id])
+      @movements = @item.movements.order(created_at: :desc)
+      end
     end
 end
