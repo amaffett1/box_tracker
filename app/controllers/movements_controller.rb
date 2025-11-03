@@ -1,29 +1,30 @@
-# encoding: utf-8
-
 class MovementsController < ApplicationController
   before_action :authenticate_user!
 
+  def index
+    @movements = current_user.movements
+                             .includes(:item, :from_box, :to_box)
+                             .order(created_at: :desc)
+    @movements_chart = current_user.movements.group("DATE(created_at)").count
+
+    # Filtri opzionali
+    @movements = @movements.where(action: params[:action_type]) if params[:action_type].present?
+    @movements = @movements.where(from_box_id: params[:from_box_id]) if params[:from_box_id].present?
+    @movements = @movements.where(to_box_id: params[:to_box_id]) if params[:to_box_id].present?
+  end
+
   def create
-    @movement = Movement.new(movement_params)
-    @movement.user = current_user
-
-    # Imposta la box di partenza (quella attuale dell’oggetto)
-    @movement.from_box = @movement.item.box
-
+    @movement = current_user.movements.new(movement_params)
     if @movement.save
-      # Se è stato selezionato un box di destinazione, aggiorna l'oggetto
-      if @movement.to_box.present?
-        @movement.item.update(box: @movement.to_box)
-      end
-      redirect_to item_path(@movement.item), notice: "Movimento registrato correttamente."
+      redirect_to @movement.item, notice: "Movimento registrato correttamente."
     else
-      redirect_to item_path(@movement.item), alert: "Errore nella registrazione del movimento."
+      redirect_to @movement.item, alert: "Errore durante la registrazione del movimento."
     end
   end
 
   private
 
   def movement_params
-    params.require(:movement).permit(:item_id, :action, :to_box_id, :notes)
+    params.require(:movement).permit(:item_id, :action, :from_box_id, :to_box_id, :notes)
   end
 end

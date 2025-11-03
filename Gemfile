@@ -68,3 +68,6 @@ group :test do
 end
 
 gem "pg_search"
+
+gem "chartkick", "~> 5.2"
+gem "groupdate", "~> 6.7"

@@ -1,20 +1,13 @@
-﻿
+﻿<!-- app/views/items/show.html.erb -->
+# encoding: utf-8
 
 <p style="color: green"><%= notice %></p>
 
-<% if @item.image.attached? %>
-  <p><%= image_tag @item.image.variant(resize_to_limit: [300, 300]) %></p>
-<% end %>
-
 <h2><%= @item.name %></h2>
+
 <p><strong>Codice:</strong> <%= @item.code %></p>
 <p><strong>Descrizione:</strong> <%= @item.description %></p>
 <p><strong>Box attuale:</strong> <%= @item.box&.name || "Nessuna box assegnata" %></p>
-
-<div style="margin-top: 1em;">
-  <%= link_to "Modifica questo oggetto", edit_item_path(@item), class: "btn btn-primary" %> |
-  <%= link_to "Torna alla lista", items_path, class: "btn btn-secondary" %>
-</div>
 
 <hr>
 
@@ -25,7 +18,7 @@
 
   <div>
     <%= f.label :action, "Tipo di movimento" %><br>
-    <%= f.select :action, [["Spostato", "moved"], ["Prestato", "loaned"], ["Restituito", "returned"]], prompt: "Seleziona" %>
+    <%= f.select :action, [["Spostato", "moved"], ["Prestato", "loaned"], ["Restituito", "returned"]], prompt: "Seleziona tipo" %>
   </div>
 
   <div>
@@ -45,30 +38,25 @@
 
 <hr>
 
-<hr>
-
 <h3>Storico movimenti</h3>
-
-<% if @movements.present? %>
-  <ul>
+<ul>
+  <% if @movements.present? %>
     <% @movements.each do |m| %>
       <li>
         <strong><%= m.created_at.strftime("%d/%m/%Y %H:%M") %></strong> –
-        <%= m.action.capitalize %> da 
-        <%= m.from_box&.name || "-" %> a 
-        <%= m.to_box&.name || "-" %> 
+        <%= m.action.capitalize %>
+        da <%= m.from_box&.name || "?" %> a <%= m.to_box&.name || "?" %>
         (<%= m.user.email %>)
-        <% if m.notes.present? %> – <em><%= m.notes %></em><% end %>
+        <% if m.notes.present? %> – <%= m.notes %><% end %>
       </li>
     <% end %>
-  </ul>
-<% else %>
-  <p>Nessun movimento registrato per questo oggetto.</p>
-<% end %>
-
+  <% else %>
+    <li>Nessun movimento registrato per questo oggetto.</li>
+  <% end %>
 </ul>
 
 <div style="margin-top: 1em;">
-  <%= button_to "Elimina questo oggetto", @item, method: :delete, data: { confirm: "Sei sicuro?" }, class: "btn btn-danger" %>
+  <%= link_to "Modifica oggetto", edit_item_path(@item), class: "btn btn-primary" %> |
+  <%= link_to "Torna alla lista", items_path, class: "btn btn-secondary" %> |
+  <%= button_to "Elimina", @item, method: :delete, data: { confirm: "Sei sicuro?" }, class: "btn btn-danger" %>
 </div>
-
