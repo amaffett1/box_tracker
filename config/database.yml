@@ -25,7 +25,8 @@ default: &default
   username: railsuser
   password: rails123
   host: localhost
-
+  port: 5433
+  
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
