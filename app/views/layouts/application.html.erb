@@ -2,7 +2,6 @@
 <html>
   <head>
     <title><%= content_for(:title) || "Box Tracker" %></title>
-    <p><%= link_to "Storico Movimenti", movements_path %></p>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Box Tracker">
@@ -12,19 +11,29 @@
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
+    <!-- Favicon e icone -->
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <!-- CSS e JavaScript -->
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
+    <% if user_signed_in? %>
+      <div style="padding: 8px; background:#f7f7f7;">
+        ✅ Autenticato come: <%= current_user.email %> |
+        <%= button_to "Esci", destroy_user_session_path, method: :delete, data: { turbo: false }, form: { style: "display:inline" }, class: "btn btn-danger"   %> |
+        <%= link_to "Storico Movimenti", movements_path %>
+      </div>
+    <% else %>
+      <div style="padding: 8px; background:#f7f7f7;">
+        <%= link_to "Accedi", new_user_session_path %>
+      </div>
+    <% end %>
+
     <%= yield %>
   </body>
 </html>
