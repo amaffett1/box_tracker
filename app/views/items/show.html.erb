@@ -39,24 +39,24 @@
 <hr>
 
 <h3>Storico movimenti</h3>
-<ul>
-  <% if @movements.present? %>
+<% if @movements.any? %>
+  <ul>
     <% @movements.each do |m| %>
       <li>
         <strong><%= m.created_at.strftime("%d/%m/%Y %H:%M") %></strong> –
-        <%= m.action.capitalize %>
-        da <%= m.from_box&.name || "?" %> a <%= m.to_box&.name || "?" %>
+        <%= m.action.capitalize %> da <%= m.from_box&.name || "—" %> a <%= m.to_box&.name || "—" %>
         (<%= m.user.email %>)
-        <% if m.notes.present? %> – <%= m.notes %><% end %>
+        <% if m.notes.present? %> – <em><%= m.notes %></em><% end %>
       </li>
     <% end %>
-  <% else %>
-    <li>Nessun movimento registrato per questo oggetto.</li>
-  <% end %>
-</ul>
+  </ul>
+<% else %>
+  <p>Nessun movimento registrato per questo oggetto.</p>
+<% end %>
+
 
 <div style="margin-top: 1em;">
-  <%= link_to "Modifica oggetto", edit_item_path(@item), class: "btn btn-primary" %> |
-  <%= link_to "Torna alla lista", items_path, class: "btn btn-secondary" %> |
+  <%= link_to "Modifica questo oggetto", edit_box_item_path(@item.box, @item) %>
+  <%= link_to "Torna alla lista", box_items_path(@item.box) %>
   <%= button_to "Elimina", @item, method: :delete, data: { confirm: "Sei sicuro?" }, class: "btn btn-danger" %>
 </div>

@@ -4,11 +4,14 @@
 
 <h1>Oggetti</h1>
 
-<div style="margin-bottom: 1em;">
-  <%= link_to "Crea nuovo oggetto", new_item_path, class: "btn btn-success" %>
-</div>
+<% if @box %>
+  <div style="margin-bottom: 1em;">
+    <!-- ✅ Link corretto per creare un nuovo oggetto dentro la box -->
+    <%= link_to "Crea nuovo oggetto", new_box_item_path(@box), class: "btn btn-success" %>
+  </div>
+<% end %>
 
-<table border="1" cellpadding="6">
+<table border="1" cellpadding="6" style="border-collapse: collapse; width: 100%;">
   <thead>
     <tr>
       <th>Codice</th>
@@ -17,6 +20,7 @@
       <th>Azioni</th>
     </tr>
   </thead>
+
   <tbody>
     <% @items.each do |item| %>
       <tr>
@@ -24,11 +28,21 @@
         <td><%= item.name %></td>
         <td><%= item.box&.name || "-" %></td>
         <td>
-          <%= link_to "Mostra", item_path(item), class: "btn btn-sm btn-primary" %> |
-          <%= link_to "Modifica", edit_item_path(item), class: "btn btn-sm btn-warning" %> |
-          <%= button_to "Elimina", item_path(item), method: :delete, data: { confirm: "Sei sicuro?" }, class: "btn btn-sm btn-danger" %>
+          <!-- ✅ Percorsi corretti, annidati nella box -->
+          <%= link_to "Mostra", box_item_path(item.box, item), class: "btn btn-sm btn-primary" %> |
+          <%= link_to "Modifica", edit_box_item_path(item.box, item), class: "btn btn-sm btn-warning" %> |
+          <%= button_to "Elimina", box_item_path(item.box, item),
+                method: :delete,
+                data: { confirm: "Sei sicuro di voler eliminare questo oggetto?" },
+                class: "btn btn-sm btn-danger" %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<% unless @box %>
+  <p style="margin-top: 1em;">
+    🔹 Per creare un nuovo oggetto, apri prima una box e clicca su “Crea nuovo oggetto”.
+  </p>
+<% end %>

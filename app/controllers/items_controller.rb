@@ -2,44 +2,54 @@
 
 class ItemsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_item, only: %i[ show edit update destroy ]
+  before_action :set_box, only: %i[index new create]
+  before_action :set_item, only: %i[show edit update destroy]
+  before_action :authorize_item!, only: %i[show edit update destroy]
 
-  # GET /items
+  # GET /boxes/:box_id/items
+  # oppure /items (tutti gli item dell’utente)
   def index
-    # Mostra solo gli item delle box dell�utente loggato
-    @items = Item.joins(:box).where(boxes: { user_id: current_user.id }).order(created_at: :desc)
+    # Se è stata richiesta una box specifica (es. /boxes/3/items)
+    @box = Box.find(params[:box_id]) if params[:box_id]
+
+    if @box
+      # Mostra solo gli item di quella box
+      @items = @box.items.order(created_at: :desc)
+    else
+      # Altrimenti mostra tutti gli item dell'utente loggato
+      @items = Item.joins(:box)
+                   .where(boxes: { user_id: current_user.id })
+                   .order(created_at: :desc)
+    end
   end
 
-  # GET /items/1
+  # GET /items/:id
   def show
-    authorize_item!
+    @movements = @item.movements.includes(:from_box, :to_box, :user).order(created_at: :desc)
   end
 
-  # GET /items/new
+  # GET /boxes/:box_id/items/new
   def new
-    @item = Item.new
+    @item = @box.items.new
   end
 
-  # GET /items/1/edit
-  def edit
-    authorize_item!
-  end
+  # GET /items/:id/edit
+  def edit; end
 
-  # POST /items
+  # POST /boxes/:box_id/items
   def create
-    @item = Item.new(item_params)
-    authorize_item!
-
+    @box = Box.find(params[:box_id])
+    @item = @box.items.new(item_params)
     if @item.save
-      redirect_to @item, notice: "Oggetto creato correttamente."
+      redirect_to box_items_path(@box), notice: "Oggetto creato correttamente."
     else
       render :new, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /items/1
+
+  # PATCH/PUT /items/:id
   def update
-    authorize_item!
     if @item.update(item_params)
       redirect_to @item, notice: "Oggetto aggiornato correttamente."
     else
@@ -47,31 +57,30 @@ class ItemsController < ApplicationController
     end
   end
 
-  # DELETE /items/1
+  # DELETE /items/:id
   def destroy
-    authorize_item!
     @item.destroy
     redirect_to items_url, notice: "Oggetto eliminato.", status: :see_other
   end
 
   private
+
+    # Carica box se presente nel path
+    def set_box
+      @box = Box.find(params[:box_id]) if params[:box_id]
+    end
+
     def set_item
       @item = Item.find(params[:id])
     end
 
-    # ?? permettiamo :image oltre ai campi base
     def item_params
-      params.require(:item).permit(:box_id, :name, :category, :quantity, :position, :notes, :image)
+      params.require(:item).permit(:box_id, :name, :category, :quantity, :position, :notes, :description, images: [])
     end
 
-    # Utente pu� agire solo sugli item delle proprie box
     def authorize_item!
       unless @item.box.user_id == current_user.id
         redirect_to items_path, alert: "Non autorizzato"
-      end
-      def show
-      @item = Item.find(params[:id])
-      @movements = @item.movements.order(created_at: :desc)
       end
     end
 end

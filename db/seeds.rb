@@ -1,50 +1,61 @@
 # encoding: utf-8
+require 'faker'
 
-puts "Pulizia database..."
+puts "Pulizia tabelle..."
 Movement.delete_all
 Item.delete_all
 Box.delete_all
 User.delete_all
 
-puts "Creazione utenti..."
-u1 = User.create!(email: "alessandro@example.com", password: "password", role: "admin")
-u2 = User.create!(email: "mario@example.com", password: "password", role: "operator")
+puts "Creo utente..."
+user = User.create!(
+  email: 'demo@example.com',
+  password: 'password123',
+  password_confirmation: 'password123',
+  role: 'user'
+)
 
-puts "Creazione box principali..."
-garage = Box.create!(code: "A001", name: "Garage", location: "Casa", description: "Box garage", user: u1)
-cucina = Box.create!(code: "A002", name: "Cucina", location: "Casa", description: "Box cucina", user: u1)
-studio  = Box.create!(code: "A003", name: "Studio", location: "Casa", description: "Box studio", user: u2)
+puts "Creo box (con annidamento)..."
+root1 = user.boxes.create!(code: 'A001', name: 'Casa',   location: 'Battipaglia', description: 'Box principale Casa')
+root2 = user.boxes.create!(code: 'A002', name: 'Garage', location: 'Battipaglia', description: 'Box principale Garage')
 
-puts "Creazione sotto-box..."
-utensili = Box.create!(code: "A001-1", name: "Utensili", location: "Garage", description: "Attrezzi vari", parent_box: garage, user: u1)
-viti     = Box.create!(code: "A001-2", name: "Viti e bulloni", location: "Garage", description: "Ferramenta piccola", parent_box: garage, user: u1)
-spezie   = Box.create!(code: "A002-1", name: "Spezie", location: "Cucina", description: "Cassetto spezie", parent_box: cucina, user: u1)
+# figli
+cucina   = user.boxes.create!(code: 'A001-1', name: 'Cucina',   location: 'Casa',   description: 'Sottobox cucina', parent: root1)
+salotto  = user.boxes.create!(code: 'A001-2', name: 'Salotto',  location: 'Casa',   description: 'Sottobox salotto', parent: root1)
+attrezzi = user.boxes.create!(code: 'A002-1', name: 'Attrezzi', location: 'Garage', description: 'Sottobox attrezzi', parent: root2)
 
-puts "Creazione oggetti..."
-items = []
+boxes = [root1, root2, cucina, salotto, attrezzi]
+
+puts "Creo oggetti e movimenti..."
 10.times do |i|
-  items << Item.create!(
-    name: "Oggetto #{i + 1}",
-    code: "IT#{100 + i}",
-    description: "Descrizione oggetto #{i + 1}",
-    box: [garage, utensili, viti, spezie, studio].sample,
-    quantity: rand(1..5)
+  b = boxes.sample
+  item = Item.create!(
+    box: b,
+    name: "Oggetto #{i+1}",
+    code: "ITM#{1000 + i}",
+    category: ['Ferramenta', 'Cucina', 'Elettronica'].sample,
+    quantity: rand(1..5),
+    position: ['Ripiano 1', 'Ripiano 2', 'Cassetto', 'Scatola'].sample,
+    notes: Faker::Lorem.sentence(word_count: 6),
+    description: Faker::Lorem.paragraph(sentence_count: 2)
   )
+
+  # 1–3 movimenti per oggetto
+  rand(1..3).times do
+    from_b = boxes.sample
+    to_b   = boxes.sample
+    Movement.create!(
+      item: item,
+      user: user,
+      from_box: from_b,
+      to_box: to_b,
+      action: %w[moved loaned returned].sample,
+      notes: Faker::Lorem.sentence(word_count: 4),
+      created_at: rand(10).days.ago + rand(0..23).hours
+    )
+    # Aggiorna box corrente dell'oggetto (simulazione spostamento)
+    item.update!(box: to_b)
+  end
 end
 
-puts "Creazione movimenti casuali..."
-10.times do
-  item = items.sample
-  from_box = item.box
-  to_box = [garage, cucina, studio, utensili, viti].sample
-  Movement.create!(
-    item: item,
-    user: [u1, u2].sample,
-    from_box: from_box,
-    to_box: to_box,
-    action: ["moved", "loaned", "returned"].sample,
-    notes: "Test movimento per #{item.name}"
-  )
-end
-
-puts "✅ Database popolato con successo!"
+puts "FATTO. Utente: demo@example.com / password123"

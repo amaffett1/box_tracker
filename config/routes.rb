@@ -15,6 +15,10 @@ Rails.application.routes.draw do
   resources :boxes do
     resources :items
   end
+  resources :items, only: [:index, :show]
 
   resources :movements, only: [:index, :create]
+
+  resources :items, only: [:index, :show, :edit, :update, :destroy]
+
 end

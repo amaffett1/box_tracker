@@ -1,19 +1,36 @@
 <p style="color: green"><%= notice %></p>
 
-<% if @box.image.attached? %>
-  <div style="margin: 10px 0;">
-    <%= image_tag url_for(@box.image), style: "max-width: 300px; height: auto; border-radius: 8px; box-shadow: 0 0 6px #aaa;" %>
-  </div>
+<h1><%= @box.name %> (<%= @box.code %>)</h1>
+<p><strong>Luogo:</strong> <%= @box.location %></p>
+<p><strong>Descrizione:</strong> <%= @box.description %></p>
+<h2>Oggetti contenuti</h2>
+<%= link_to "Vedi oggetti in questa box", box_items_path(@box), class: "btn btn-primary" %>
+<h2>Sottobox</h2>
+<% if @box.children.any? %>
+  <ul>
+    <% @box.children.each do |child| %>
+      <li><%= link_to child.name, box_path(child) %> (<%= child.code %>)</li>
+    <% end %>
+  </ul>
 <% else %>
-  <p><em>Nessuna immagine allegata</em></p>
+  <p>Nessun sottobox.</p>
 <% end %>
 
+<h2>Oggetti nella box</h2>
+<% if @box.items.any? %>
+  <ul>
+    <% @box.items.each do |it| %>
+      <li><%= link_to it.name, item_path(it) %> (<%= it.code %>)</li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>Nessun oggetto in questa box.</p>
+<% end %>
 
-<%= render @box %>
-
-<div>
-  <%= link_to "Edit this box", edit_box_path(@box) %> |
-  <%= link_to "Back to boxes", boxes_path %>
-
-  <%= button_to "Destroy this box", @box, method: :delete %>
-</div>
+<% if @box.images.attached? %>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin:10px 0;">
+    <% @box.images.each do |img| %>
+      <%= image_tag img.variant(resize_to_limit: [300, 300]) %>
+    <% end %>
+  </div>
+<% end %>

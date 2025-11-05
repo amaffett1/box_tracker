@@ -1,41 +1,50 @@
-<%= form_with(model: box) do |form| %>
-  <% if box.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(box.errors.count, "error") %> prohibited this box from being saved:</h2>
-      <ul>
-        <% box.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
-    <%= form.label :code %>
+<%= form_with(model: @box) do |form| %>
+  <div>
+    <%= form.label :code %><br>
     <%= form.text_field :code %>
   </div>
 
-  <div class="field">
-    <%= form.label :name %>
+  <div>
+    <%= form.label :name %><br>
     <%= form.text_field :name %>
   </div>
 
-  <div class="field">
-    <%= form.label :location %>
+  <div>
+    <%= form.label :location %><br>
     <%= form.text_field :location %>
   </div>
 
-  <div class="field">
-    <%= form.label :description %>
+  <div>
+    <%= form.label :description %><br>
     <%= form.text_area :description %>
   </div>
 
-  <div class="field">
-    <%= form.label :image %>
-    <%= form.file_field :image, direct_upload: true %>
+  <!-- Selezione Box genitore -->
+  <div>
+    <%= form.label :parent_id, "Box genitore" %><br>
+    <%= form.collection_select :parent_id,
+          current_user.boxes.where.not(id: @box.id),
+          :id, :name,
+          include_blank: "Nessun genitore" %>
   </div>
 
-  <div class="actions">
+  <!-- Upload immagini multiple -->
+  <div>
+    <%= form.label :images, "Immagini box (multiplo)" %><br>
+    <%= form.file_field :images, multiple: true, accept: "image/*" %>
+  </div>
+
+  <!-- Mostra anteprima immagini se già caricate -->
+  <% if @box.images.attached? %>
+    <p><strong>Anteprime:</strong></p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <% @box.images.each do |img| %>
+        <%= image_tag img.variant(resize_to_limit: [160, 160]) %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div style="margin-top:10px">
     <%= form.submit %>
   </div>
 <% end %>

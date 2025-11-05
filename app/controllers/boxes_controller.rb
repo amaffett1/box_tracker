@@ -54,6 +54,6 @@ class BoxesController < ApplicationController
 
     # ?? importante: permettiamo :image oltre ai campi base
     def box_params
-      params.require(:box).permit(:code, :name, :location, :description, :image)
+      params.require(:box).permit(:code, :name, :location, :description, :parent_id, images: [])
     end
 end

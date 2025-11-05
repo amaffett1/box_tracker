@@ -1,26 +1,17 @@
-# encoding: utf-8
+<p style="color: green"><%= notice %></p>
+<h1>Movimenti</h1>
 
-<h1>Storico dei Movimenti</h1>
+<h2>Andamento nel tempo</h2>
+<%= line_chart @series, height: "300px" %>
 
-<div style="margin-bottom: 1em;">
-  <%= form_with url: movements_path, method: :get, local: true do |f| %>
-    <label>Tipo:</label>
-    <%= select_tag :action_type, options_for_select([["Tutti", ""], ["Spostato", "moved"], ["Prestato", "loaned"], ["Restituito", "returned"]], params[:action_type]), onchange: "this.form.submit()" %>
-
-    <label>Box di destinazione:</label>
-    <%= select_tag :to_box_id, options_from_collection_for_select(current_user.boxes, :id, :name, params[:to_box_id]), include_blank: "Tutti", onchange: "this.form.submit()" %>
-  <% end %>
-</div>
-<h2>Andamento dei movimenti nel tempo</h2>
-<%= line_chart @movements_chart, height: "300px", colors: ["#007bff"] %>
 <hr>
 
-<table border="1" cellpadding="5" style="border-collapse: collapse;">
+<table border="1" cellpadding="5" style="border-collapse: collapse; width: 100%;">
   <thead>
     <tr>
-      <th>Data</th>
-      <th>Oggetto</th>
+      <th>Quando</th>
       <th>Azione</th>
+      <th>Oggetto</th>
       <th>Da</th>
       <th>A</th>
       <th>Utente</th>
@@ -31,12 +22,19 @@
     <% @movements.each do |m| %>
       <tr>
         <td><%= m.created_at.strftime("%d/%m/%Y %H:%M") %></td>
-        <td><%= link_to m.item.name, item_path(m.item) %></td>
         <td><%= m.action.capitalize %></td>
-        <td><%= m.from_box&.name || "-" %></td>
-        <td><%= m.to_box&.name || "-" %></td>
-        <td><%= m.user.email %></td>
-        <td><%= m.notes %></td>
+        <td>
+  <% if m.item.present? && m.item.box.present? %>
+    <%= link_to m.item.name, box_item_path(m.item.box, m.item) %>
+  <% else %>
+    <em>Oggetto o box eliminato</em>
+  <% end %>
+</td>
+
+        <td><%= m.from_box&.name || "—" %></td>
+        <td><%= m.to_box&.name || "—" %></td>
+        <td><%= m.user&.email || "—" %></td>
+        <td><%= m.notes.presence || "—" %></td>
       </tr>
     <% end %>
   </tbody>

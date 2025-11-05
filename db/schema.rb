@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_03_230933) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_05_161312) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,8 +49,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_03_230933) do
     t.string "location"
     t.string "name"
     t.integer "parent_box_id"
+    t.bigint "parent_id"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["parent_id"], name: "index_boxes_on_parent_id"
     t.index ["user_id"], name: "index_boxes_on_user_id"
   end
 
@@ -104,6 +106,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_03_230933) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "boxes", "boxes", column: "parent_id"
   add_foreign_key "boxes", "users"
   add_foreign_key "items", "boxes"
   add_foreign_key "movements", "boxes", column: "from_box_id"
