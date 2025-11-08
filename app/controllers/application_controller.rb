@@ -9,4 +9,9 @@ class ApplicationController < ActionController::Base
   def after_sign_out_path_for(resource_or_scope)
     new_user_session_path
   end
+  # Gestione 404 per record mancanti
+  rescue_from ActiveRecord::RecordNotFound do
+  redirect_to authenticated_root_path, alert: "Elemento non trovato."
+  end
+
 end
