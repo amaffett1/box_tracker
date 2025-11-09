@@ -10,7 +10,9 @@ module BoxTracker
 
     # 🔹 Imposta lingua e fuso orario
     config.time_zone = "Rome"
+    config.i18n.available_locales = [:en, :it]
     config.i18n.default_locale = :it
+
 
     # 🔹 Usa PostgreSQL (nessun database secondario)
     config.active_record.database_selector = nil
