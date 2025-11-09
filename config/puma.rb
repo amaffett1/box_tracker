@@ -1,11 +1,24 @@
-# config/puma.rb
-max_threads_count = ENV.fetch(" RAILS_MAX_THREADS") {  5 }min_threads_count = ENV.fetch("R AILS_MIN_THREADS") { m ax_threads_count }
-threads min _threads_count, max_threads_count
+# encoding: utf-8
+# Puma configuration file
 
-port ENV.f etch("PORT ") { 3000 }
-environment ENV.fe tch("RAILS _ENV") { "prod uction" }
-pidfile ENV.fet ch("PIDFIL E") { "tmp/p ids/server.pid" }
-workers ENV.fetch ("WEB_CONC URRENCY") { 2 }
-prel oad _app!
+max_threads_count = ENV.fetch("RAILS_MAX_THREADS", 5)
+min_threads_count = ENV.fetch("RAILS_MIN_THREADS", max_threads_count)
+threads min_threads_count, max_threads_count
 
-plugin :tmp_restart 
+# Imposta la porta: di default 3000
+port ENV.fetch("PORT", 3000)
+
+# Imposta l’ambiente (development o production)
+environment ENV.fetch("RAILS_ENV") { "development" }
+
+# File PID
+pidfile ENV.fetch("PIDFILE", "tmp/pids/server.pid")
+
+# Numero di worker process (usa 2 in produzione, 0 in locale)
+workers ENV.fetch("WEB_CONCURRENCY", 0)
+
+# Precarica l'app (ottimizza la memoria in produzione)
+preload_app!
+
+# Permette di riavviare Puma con `rails restart`
+plugin :tmp_restart
