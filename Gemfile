@@ -71,3 +71,5 @@ gem "pg_search"
 
 gem "chartkick", "~> 5.2"
 gem "groupdate", "~> 6.7"
+
+gem "rails-i18n", "~> 8.0"
