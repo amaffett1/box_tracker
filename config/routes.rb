@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  # ✅ Devise gestisce login/logout/signup
+  # ✅ Autenticazione con Devise
   devise_for :users
 
   # ✅ Home page diversa se loggato o meno
@@ -11,14 +11,11 @@ Rails.application.routes.draw do
     root to: "devise/sessions#new", as: :unauthenticated_root
   end
 
-  # ✅ Rotte principali della tua app
+  # ✅ Rotte principali dell’app
   resources :boxes do
-    resources :items
+    resources :items, only: [:index, :show, :edit, :update, :destroy]
   end
-  resources :items, only: [:index, :show]
 
+  # ✅ Movimenti indipendenti
   resources :movements, only: [:index, :create]
-
-  resources :items, only: [:index, :show, :edit, :update, :destroy]
-
 end
